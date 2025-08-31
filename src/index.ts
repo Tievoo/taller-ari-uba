@@ -1,5 +1,6 @@
+import { readFileSync, writeFileSync } from "fs";
+import Handlebars from "handlebars";
 import { Client as DBClient } from "pg";
-import { readFileSync } from "fs";
 import type { Alumno } from "./types.db";
 
 async function leerYParsearCSV(filePath: string): Promise<[string[], string[]]> {
@@ -36,7 +37,15 @@ async function obtenerPrimerAlumnoCertificable(dbClient: DBClient): Promise<Alum
 }
 
 async function certificarAlumno(alumno: Alumno) : Promise<void> {
-    console.log(`Alumno a certificar: ${JSON.stringify(alumno)}`);
+    const template = readFileSync("data/certificado-template.html", "utf-8");
+    const compiledTemplate = Handlebars.compile(template);
+    const result = compiledTemplate({ 
+        nombre_completo: `${alumno.apellido}, ${alumno.nombres}`, 
+        titulo: alumno.titulo,
+        fecha_emision: new Date(alumno.egreso).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })
+    });
+    writeFileSync(`certificados/certificado_${alumno.lu.replace(/\//g, '-')}.html`, result);
+    console.log(`Certificado generado para alumno: ${alumno.nombres} ${alumno.apellido} con LU: ${alumno.lu}`);
 }
 
 async function main() {
