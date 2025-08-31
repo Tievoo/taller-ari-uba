@@ -12,7 +12,7 @@ async function leerYParsearCSV(filePath: string): Promise<[string[], string[]]> 
     return [dataLines, columns]
 }
 
-async function refrescarAlumnos(dbClient: DBClient, alumnos: string[], columnas: string[]) {
+async function refrescarAlumnos(dbClient: DBClient, alumnos: string[], columnas: string[]): Promise<void> {
     await dbClient.query("DELETE FROM aida.alumnos");
     for (const alumno of alumnos) {
         const values = alumno.split(",").map(value => value.trim());
@@ -35,15 +35,20 @@ async function obtenerPrimerAlumnoCertificable(dbClient: DBClient): Promise<Alum
     return res.rows[0] || null;
 }
 
+async function certificarAlumno(alumno: Alumno) : Promise<void> {
+    console.log(`Alumno a certificar: ${JSON.stringify(alumno)}`);
+}
+
 async function main() {
     const dbClient = new DBClient();
     await dbClient.connect();
 
-    const [alumnos, columnas] : [string[], string[]] = await leerYParsearCSV("data/alumnos.csv")
+    const [alumnos, columnas] = await leerYParsearCSV("data/alumnos.csv")
     await refrescarAlumnos(dbClient, alumnos, columnas);
+
     const alumnoACertificar : Alumno | null = await obtenerPrimerAlumnoCertificable(dbClient);
     if (!alumnoACertificar) console.log("No hay alumnos certificables.");
-    else console.log(`Alumno a certificar: ${JSON.stringify(alumnoACertificar)}`);
+    else await certificarAlumno(alumnoACertificar);
 
     await dbClient.end();
 }
