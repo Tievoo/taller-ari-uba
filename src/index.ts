@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import Handlebars from "handlebars";
 import { Client as DBClient } from "pg";
 import type { Alumno } from "./types.db";
@@ -44,6 +44,7 @@ async function certificarAlumno(alumno: Alumno) : Promise<void> {
         titulo: alumno.titulo,
         fecha_emision: new Date(alumno.egreso).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })
     });
+    if(!existsSync("certificados")) mkdirSync("certificados");
     writeFileSync(`certificados/certificado_${alumno.lu.replace(/\//g, '-')}.html`, result);
     console.log(`Certificado generado para alumno: ${alumno.nombres} ${alumno.apellido} con LU: ${alumno.lu}`);
 }
