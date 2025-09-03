@@ -2,6 +2,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import Handlebars from "handlebars";
 import { Client as DBClient } from "pg";
 import type { Alumno } from "./types.db";
+import dotenv from 'dotenv';
+dotenv.config({ quiet: true })
 
 async function leerYParsearCSV(filePath: string): Promise<[string[], string[]]> {
     const fileContent = readFileSync(filePath, "utf-8");
@@ -14,7 +16,6 @@ async function leerYParsearCSV(filePath: string): Promise<[string[], string[]]> 
 }
 
 async function refrescarAlumnos(dbClient: DBClient, alumnos: string[], columnas: string[]): Promise<void> {
-    await dbClient.query("DELETE FROM aida.alumnos");
     for (const alumno of alumnos) {
         const values = alumno.split(",").map(value => value.trim());
         await dbClient.query(
@@ -26,17 +27,24 @@ async function refrescarAlumnos(dbClient: DBClient, alumnos: string[], columnas:
     }
 }
 
-async function obtenerPrimerAlumnoCertificable(dbClient: DBClient): Promise<Alumno | null> {
-    const res = await dbClient.query(
-        `SELECT * FROM aida.alumnos 
-        WHERE titulo IS NOT NULL AND titulo_en_tramite IS NOT NULL 
-        ORDER BY egreso 
-        LIMIT 1`
-    );
-    return res.rows[0] || null;
+async function obtenerAlumnosPorAtributo(dbClient: DBClient, atributo: string, value:string) {
+    const res = await dbClient.query(`
+        SELECT * FROM aida.alumnos
+        WHERE ${atributo} = '${value}';
+    `)
+    return res.rows;
 }
 
-async function certificarAlumno(alumno: Alumno) : Promise<void> {
+async function obtenerAlumnoPorAtributo(dbClient: DBClient, atributo: string, value:string) {
+    const res = await dbClient.query(`
+        SELECT * FROM aida.alumnos
+        WHERE ${atributo} = '${value}'
+        LIMIT 1;
+    `)
+    return res.rows[0];
+}
+
+function certificarAlumno(alumno: Alumno) : void {
     const template = readFileSync("data/certificado-template.html", "utf-8");
     const compiledTemplate = Handlebars.compile(template);
     const result = compiledTemplate({ 
@@ -53,12 +61,36 @@ async function main() {
     const dbClient = new DBClient();
     await dbClient.connect();
 
-    const [alumnos, columnas] = await leerYParsearCSV("data/alumnos.csv")
-    await refrescarAlumnos(dbClient, alumnos, columnas);
+    const [command, value] = process.argv.slice(2);
 
-    const alumnoACertificar : Alumno | null = await obtenerPrimerAlumnoCertificable(dbClient);
-    if (!alumnoACertificar) console.log("No hay alumnos certificables.");
-    else await certificarAlumno(alumnoACertificar);
+    if (!command || !value) {
+        await dbClient.end();
+        return console.error("Requieres one argument from: --fecha --archivo --lu")
+    }
+
+    switch (command) {
+        case '--archivo':
+            const [alumnos, columnas] = await leerYParsearCSV(value);
+            await refrescarAlumnos(dbClient, alumnos, columnas);
+            break;
+        case '--fecha':
+            const alumnosPorFecha : Alumno[] = await obtenerAlumnosPorAtributo(dbClient, 'titulo_en_tramite', value);
+            if (!alumnosPorFecha || alumnosPorFecha.length == 0) break;
+            for (const alumno of alumnosPorFecha) {
+                certificarAlumno(alumno)
+            }
+            break;
+        case '--lu':
+            const alumnoPorLU : Alumno = await obtenerAlumnoPorAtributo(dbClient, 'lu', value);
+            if (!alumnoPorLU || !alumnoPorLU.titulo_en_tramite) break;
+            certificarAlumno(alumnoPorLU)
+            break;
+        default:
+            console.error("Invalid command. Use one from: --fecha --archivo --lu")
+            break;
+
+    }
+
 
     await dbClient.end();
 }
