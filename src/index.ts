@@ -27,7 +27,7 @@ async function refrescarAlumnos(dbClient: DBClient, alumnos: string[], columnas:
     }
 }
 
-async function obtenerAlumnosPorAtributo(dbClient: DBClient, atributo: string, value:string) {
+async function obtenerAlumnosPorAtributo(dbClient: DBClient, atributo: string, value: string) {
     const res = await dbClient.query(`
         SELECT * FROM aida.alumnos
         WHERE ${atributo} = '${value}';
@@ -35,7 +35,7 @@ async function obtenerAlumnosPorAtributo(dbClient: DBClient, atributo: string, v
     return res.rows;
 }
 
-async function obtenerAlumnoPorAtributo(dbClient: DBClient, atributo: string, value:string) {
+async function obtenerAlumnoPorAtributo(dbClient: DBClient, atributo: string, value: string) {
     const res = await dbClient.query(`
         SELECT * FROM aida.alumnos
         WHERE ${atributo} = '${value}'
@@ -44,55 +44,57 @@ async function obtenerAlumnoPorAtributo(dbClient: DBClient, atributo: string, va
     return res.rows[0];
 }
 
-function certificarAlumno(alumno: Alumno) : void {
+function certificarAlumno(alumno: Alumno): void {
     const template = readFileSync("data/certificado-template.html", "utf-8");
     const compiledTemplate = Handlebars.compile(template);
-    const result = compiledTemplate({ 
-        nombre_completo: `${alumno.apellido}, ${alumno.nombres}`, 
+    const result = compiledTemplate({
+        nombre_completo: `${alumno.apellido}, ${alumno.nombres}`,
         titulo: alumno.titulo,
         fecha_emision: new Date(alumno.egreso).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })
     });
-    if(!existsSync("certificados")) mkdirSync("certificados");
+    if (!existsSync("certificados")) mkdirSync("certificados");
     writeFileSync(`certificados/certificado_${alumno.lu.replace(/\//g, '-')}.html`, result);
     console.log(`Certificado generado para alumno: ${alumno.nombres} ${alumno.apellido} con LU: ${alumno.lu}`);
 }
 
 async function main() {
     const dbClient = new DBClient();
-    await dbClient.connect();
 
-    const [command, value] = process.argv.slice(2);
+    try {
+        await dbClient.connect();
 
-    if (!command || !value) {
-        await dbClient.end();
-        return console.error("Requieres one argument from: --fecha --archivo --lu")
+        const [command, value] = process.argv.slice(2);
+
+        if (!command || !value) {
+            throw new Error("Se necesita uno de los siguientes argumentos: --fecha --archivo --lu con un valor asociado")
+        }
+
+        switch (command) {
+            case '--archivo':
+                const [alumnos, columnas] = await leerYParsearCSV(value);
+                await refrescarAlumnos(dbClient, alumnos, columnas);
+                break;
+            case '--fecha':
+                const alumnosPorFecha: Alumno[] = await obtenerAlumnosPorAtributo(dbClient, 'titulo_en_tramite', value);
+                if (!alumnosPorFecha || alumnosPorFecha.length == 0) throw new Error("No hay alumnos con titulos en tramite en esa fecha");
+                for (const alumno of alumnosPorFecha) {
+                    certificarAlumno(alumno)
+                }
+                break;
+            case '--lu':
+                const alumnoPorLU: Alumno = await obtenerAlumnoPorAtributo(dbClient, 'lu', value);
+                if (!alumnoPorLU) throw new Error("No existe un alumno con ese LU")
+                if (!alumnoPorLU.titulo_en_tramite) throw new Error("El alumno con ese LU no tiene titulo en tramite")
+                certificarAlumno(alumnoPorLU)
+                break;
+            default:
+                throw new Error("Comando invalido. Usar: --fecha --archivo --lu")
+        }
+    } catch (error) {
+        console.error(String(error))
     }
-
-    switch (command) {
-        case '--archivo':
-            const [alumnos, columnas] = await leerYParsearCSV(value);
-            await refrescarAlumnos(dbClient, alumnos, columnas);
-            break;
-        case '--fecha':
-            const alumnosPorFecha : Alumno[] = await obtenerAlumnosPorAtributo(dbClient, 'titulo_en_tramite', value);
-            if (!alumnosPorFecha || alumnosPorFecha.length == 0) break;
-            for (const alumno of alumnosPorFecha) {
-                certificarAlumno(alumno)
-            }
-            break;
-        case '--lu':
-            const alumnoPorLU : Alumno = await obtenerAlumnoPorAtributo(dbClient, 'lu', value);
-            if (!alumnoPorLU || !alumnoPorLU.titulo_en_tramite) break;
-            certificarAlumno(alumnoPorLU)
-            break;
-        default:
-            console.error("Invalid command. Use one from: --fecha --archivo --lu")
-            break;
-
-    }
-
-
     await dbClient.end();
+
 }
 
 main();
