@@ -57,18 +57,13 @@ function certificarAlumno(alumno: Alumno): void {
     console.log(`Certificado generado para alumno: ${alumno.nombres} ${alumno.apellido} con LU: ${alumno.lu}`);
 }
 
-async function main() {
-    const dbClient = new DBClient();
-
+async function procesarComando(dbClient: DBClient, command: string | undefined, value: string| undefined) {
+    
     try {
-        await dbClient.connect();
-
-        const [command, value] = process.argv.slice(2);
-
-        if (!command || !value) {
+    if (!command || !value) {
             throw new Error("Se necesita uno de los siguientes argumentos: --fecha --archivo --lu con un valor asociado")
         }
-
+    
         switch (command) {
             case '--archivo':
                 const [alumnos, columnas] = await leerYParsearCSV(value);
@@ -93,8 +88,19 @@ async function main() {
     } catch (error) {
         console.error(String(error))
     }
-    await dbClient.end();
+}
 
+async function main() {
+    
+    const dbClient = new DBClient();
+    await dbClient.connect();
+
+    const [command, value]: string[] = process.argv.slice(2);
+
+    await procesarComando(dbClient, command, value);
+        
+    await dbClient.end();
+    
 }
 
 main();
