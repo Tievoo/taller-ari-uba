@@ -57,18 +57,26 @@ function certificarAlumno(alumno: Alumno): void {
     console.log(`Certificado generado para alumno: ${alumno.nombres} ${alumno.apellido} con LU: ${alumno.lu}`);
 }
 
-async function main() {
-    const dbClient = new DBClient();
+async function procesarComandos(dbClient: DBClient) {
+    const commands: string[] = process.argv.slice(2);
 
     try {
-        await dbClient.connect();
+        if (commands.length == 0) 
+            throw new Error("Se necesita al menos uno de los siguientes argumentos: --fecha --archivo --lu con un valor asociado");
 
-        const [command, value] = process.argv.slice(2);
+        if(commands.length % 2 != 0)
+            throw new Error("Algún comando no tiene argumento necesario");
 
-        if (!command || !value) {
-            throw new Error("Se necesita uno de los siguientes argumentos: --fecha --archivo --lu con un valor asociado")
-        }
+        for(let i = 0; i < commands.length; i+=2)
+            await procesarComando(dbClient, commands[i], commands[i + 1]);
 
+    } catch (error) {
+        console.error(String(error))
+    }
+}
+
+async function procesarComando(dbClient: DBClient, command: string, value: string) {
+    
         switch (command) {
             case '--archivo':
                 const [alumnos, columnas] = await leerYParsearCSV(value);
@@ -90,9 +98,16 @@ async function main() {
             default:
                 throw new Error("Comando invalido. Usar: --fecha --archivo --lu")
         }
-    } catch (error) {
-        console.error(String(error))
-    }
+    
+}
+
+async function main() {
+    
+    const dbClient = new DBClient();
+    await dbClient.connect();
+
+    await procesarComandos(dbClient);
+        
     await dbClient.end();
 
 }
