@@ -1,8 +1,0 @@
-# dependencies (bun install)
-node_modules
-
-# dotenv environment variable files
-.env
-
-certificados/
-data/*.csv
