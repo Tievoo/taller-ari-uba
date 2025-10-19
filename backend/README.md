@@ -1,4 +1,4 @@
-# backend
+# bbdd
 
 To install dependencies:
 
