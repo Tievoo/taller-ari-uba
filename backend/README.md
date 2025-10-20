@@ -24,9 +24,9 @@ Y el server:
 bun run index.ts
 ```
 
-Para ejecutar las querys de ```/database/init```, se puede correr:
+Para ejecutar las querys de ```/src/database/init```, se puede correr:
 ```bash
-docker exec backend-db-1 psql -U fulbo -d fulbo_db -c "QUERY"
+docker exec -i backend-db-1 psql -U fulbo -d fulbo_db < ruta/a/query.sql
 ```
 
 This project was created using `bun init` in bun v1.2.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
