@@ -1,0 +1,5 @@
+PGUSER=fulbo
+PGPASSWORD='fulbo123'
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=fulbo_db
