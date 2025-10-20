@@ -16,7 +16,8 @@ CREATE TABLE users (
 
 CREATE TABLE court_type (
     id TEXT PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL
+    name VARCHAR(100) UNIQUE NOT NULL,
+    price INTEGER NOT NULL
 );
 
 CREATE TABLE courts (
