@@ -1,20 +1,12 @@
-import express, { Request, Response } from "express";
-import { getTablesHTML } from "./src/database/db";
+import express, { type Request, type Response } from "express";
 
 const app = express();
+const port = process.env.PORT || 8080;
 
-
-app.get("/tables", async (req: Request, res: Response) => {
-  try {
-    const html = await getTablesHTML();
-    res.setHeader("Content-Type", "text/html");
-    res.send(html);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("<h1>Error al obtener las tablas</h1>");
-  }
+app.get("/ping", (_, res: Response) => {
+  res.status(200).send("ok");
 });
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo en http://localhost:3000");
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });

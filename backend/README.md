@@ -8,9 +8,9 @@ bun install
 
 To run:
 
-Renombrar ```env-example``` a ```.env```:
+Duplicar ```.env.example``` y renombrar a ```.env```:
 ```bash
-cp env-example .env
+cp .env.example .env
 ```
 
 Correr el contenedor:
@@ -23,10 +23,3 @@ Y el server:
 ```bash
 bun run index.ts
 ```
-
-Para ejecutar las querys de ```/src/database/init```, se puede correr:
-```bash
-docker exec -i backend-db-1 psql -U fulbo -d fulbo_db < ruta/a/query.sql
-```
-
-This project was created using `bun init` in bun v1.2.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
