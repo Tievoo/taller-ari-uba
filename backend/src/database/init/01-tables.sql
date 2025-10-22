@@ -6,6 +6,7 @@ CREATE TABLE users (
     password VARCHAR(255),
     google_id VARCHAR(100) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    role VARCHAR(50) DEFAULT 'user',
     
     CONSTRAINT users_auth_method_check 
         CHECK (
@@ -37,5 +38,3 @@ CREATE TABLE bookings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(court_id, booking_date, start_time, end_time)
 );
-
--- Falta definir cuanto se paga, y donde se define, si depende del tipo, de la cancha en sí, del día, etc.
