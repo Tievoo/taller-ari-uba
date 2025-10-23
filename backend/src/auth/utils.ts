@@ -1,0 +1,35 @@
+import { UserModel, type User } from "../users/model";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+function generateAuthToken(user: User) : string {
+    if (!JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
+    }
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "12h" });
+    return token;
+}
+
+export async function login(email: string, password: string): Promise<string> {
+    const user = await UserModel.findByEmail(email);
+    if (!user) {
+        throw new Error("User not found");
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+        throw new Error("Invalid password");
+    }
+    return generateAuthToken(user);
+}
+
+export async function register(user: Omit<User, "id">): Promise<string> {
+    const existingUser = await UserModel.findByEmail(user.email);
+    if (existingUser) {
+        throw new Error("Email already in use");
+    }
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const newUser = await UserModel.create({ ...user, password: hashedPassword });
+    return generateAuthToken(newUser);
+}
