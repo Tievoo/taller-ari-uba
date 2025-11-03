@@ -17,4 +17,9 @@ export class CourtModel {
         return result.rows as Court[];
     }
 
+    static async getAllByType(type: string) {
+        const result = await dbClient.query('SELECT * FROM courts WHERE court_type_id = $1', [type]);
+        return result.rows as Court[];
+    }
+
 }
