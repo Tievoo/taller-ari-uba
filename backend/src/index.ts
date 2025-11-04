@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express";
-import { errorHandler } from "./src/middleware/error-handler";
-import { connectDatabase } from "./src/database/db";
+import { errorHandler } from "./middleware/error-handler";
+import { connectDatabase } from "./database/db";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -11,7 +11,8 @@ app.get("/ping", (_, res: Response) => {
   res.status(200).send("ok");
 });
 
-app.use('/auth', require('./src/auth/route').default);
+app.use('/auth', require('./auth/route').default);
+app.use('/courts', require('./courts/route').default);
 
 app.use(errorHandler);
 

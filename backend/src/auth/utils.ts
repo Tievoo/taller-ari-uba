@@ -2,9 +2,8 @@ import { UserModel, type User } from "../users/model";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 function generateAuthToken(user: User) : string {
+    const { JWT_SECRET } = process.env;
     if (!JWT_SECRET) {
         throw new Error("JWT_SECRET is not defined");
     }
