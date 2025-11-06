@@ -3,13 +3,12 @@ import { CourtModel } from './model';
 
 const router = Router();
 
-router.get('/courts', async (req, res, next) => {
-    const {type} = req.query;
+router.get('/', async (req, res) => {
+    const { type } = req.query;
 
-    if(type) 
-        return CourtModel.getAllByType(type);
+    if (type && typeof type === 'string') return res.json(await CourtModel.getAllByType(type));
 
-    return CourtModel.getAll();
+    return res.json(await CourtModel.getAll());
 });
 
 export default router;

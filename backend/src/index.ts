@@ -11,8 +11,9 @@ app.get("/ping", (_, res: Response) => {
   res.status(200).send("ok");
 });
 
-app.use('/auth', require('./auth/route').default);
-app.use('/courts', require('./courts/route').default);
+app.use('/auth', require('./auth/routes').default);
+app.use('/courts', require('./courts/routes').default);
+app.use('/bookings', require('./bookings/routes').default);
 
 app.use(errorHandler);
 

@@ -6,7 +6,6 @@ export type Booking = {
     court_id: string,
     booking_date: string,
     start_time: string,
-    end_time: string,
     created_at: Date
 };
 
@@ -21,7 +20,13 @@ export class BookingModel {
         return result.rows as Booking[];
     }
 
-    static async create(user_id: number, court_id: string, booking_date: string, start_time: string, end_time: string) {
+    static async getByUserId(user_id: string) {
+        const result = await dbClient.query('SELECT * FROM bookings WHERE user_id = $1', [user_id]);
+        return result.rows as Booking[];
+    }
+
+    static async create(user_id: string, court_id: string, booking_date: string, start_time: string) {
+        const end_time = `${(parseInt(start_time.split(':')[0]!) + 1).toString().padStart(2, '0')}:${start_time.split(':')[1]}`;
         const result = await dbClient.query(
             `INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time) 
             VALUES ($1, $2, $3, $4, $5) RETURNING *`, [user_id, court_id, booking_date, start_time, end_time])
