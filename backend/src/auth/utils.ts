@@ -1,11 +1,13 @@
 import { UserModel, type User } from "../users/model";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { ErrorType } from "../middleware/error-handler";
 
 function generateAuthToken(user: User) : string {
     const { JWT_SECRET } = process.env;
     if (!JWT_SECRET) {
-        throw new Error("JWT_SECRET is not defined");
+        console.log("JWT_SECRET is not defined");
+        throw new Error(ErrorType.InternalServerError);
     }
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "12h" });
     return token;
@@ -14,11 +16,11 @@ function generateAuthToken(user: User) : string {
 export async function login(email: string, password: string): Promise<string> {
     const user = await UserModel.findByEmail(email);
     if (!user) {
-        throw new Error("User not found");
+        throw new Error(ErrorType.NotFound);
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-        throw new Error("Invalid password");
+        throw new Error(ErrorType.NotFound); // no le voy a avisar que el email existe
     }
     return generateAuthToken(user);
 }

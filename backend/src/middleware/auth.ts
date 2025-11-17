@@ -9,23 +9,23 @@ type AuthOptions = {
 
 export const auth = ({ admin = false }: AuthOptions) => (req: Request, res: Response, next: NextFunction) => {
     const { JWT_SECRET } = process.env;
-    const accessToken = req.headers['authorization']?.split(' ')[1];
+    const accessToken = req.cookies?.access_token;
     if (!accessToken || !JWT_SECRET) {
-        return next(ErrorType.Unauthorized);
+        return next(new Error(ErrorType.Unauthorized));
     }
 
-    jwt.verify(accessToken, JWT_SECRET, async (err, payload) => {
+    jwt.verify(accessToken, JWT_SECRET, async (err: jwt.VerifyErrors | null, payload: string | jwt.JwtPayload | undefined) => {
         if (err || !payload || typeof payload === 'string' || !('id' in payload)) {
-            return next(ErrorType.Unauthorized);
+            return next(new Error(ErrorType.Unauthorized));
         }
         
         const user = await UserModel.findById(payload.id)
         if (!user) {
-            return next(ErrorType.Unauthorized);
+            return next(new Error(ErrorType.Unauthorized));
         }
 
         if (admin && user.role !== 'admin') {
-            return next(ErrorType.Forbidden);
+            return next(new Error(ErrorType.Forbidden));
         }
         req.user = user;
         next();

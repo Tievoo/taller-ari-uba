@@ -17,18 +17,19 @@ const errorStatusMap: Record<ErrorType, number> = {
 };
 
 export function errorHandler(
-    err: Error | ErrorType,
+    err: Error | { message: ErrorType },
     req: Request,
     res: Response,
     next: NextFunction
 ) {
     
-    if (typeof err === 'string' && err in ErrorType) {
-        const status = errorStatusMap[err as ErrorType] || 500;
-        return res.status(status).json({ error: err });
+    const errorValues = Object.values(ErrorType);
+    if (err.message && errorValues.includes(err.message as ErrorType)) {
+        const status = errorStatusMap[err.message as ErrorType] || 500;
+        return res.status(status).json({ error: err.message });
     }
     
-    console.error('Unhandled error:', err);
+    console.error('Unhandled error', err);
     const errorMessage = err instanceof Error ? err.message : 'An error occurred';
     return res.status(500).json({ 
         error: ErrorType.InternalServerError,

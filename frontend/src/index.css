@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@theme {
+    --height-screen-nav: calc(100vh - 64px);
+}
+
+button {
+    cursor: pointer;
+}

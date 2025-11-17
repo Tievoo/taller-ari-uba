@@ -1,34 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const loginHandler = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: implement login logic (e.g., call API, validate, set auth)
-    console.log("loginHandler called", { username, password });
-  };
-
+  const { login } = useAuth();
   const navigate = useNavigate();
 
+  const loginHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await login({ email, password }).catch((err) => {
+      alert("Login error: " + err);
+      return null
+    });
+    navigate("/");
+
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen-nav flex items-center justify-center">
       <form
         onSubmit={loginHandler}
         className="w-full max-w-md p-6 border rounded bg-white"
       >
-        <h2 className="font-heading text-2xl mb-4 text-indigo-800">Login</h2>
+        <h2 className="font-heading text-2xl mb-4 text-indigo-800">Iniciar Sesión</h2>
 
         <label className="block mb-2">
-          <span className="text-sm">Usuario</span>
+          <span className="text-sm">Email</span>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full border rounded px-3 py-2 font-body border-gray-300"
-            placeholder="Ingrese su usuario"
+            placeholder="Ingrese su email"
           />
         </label>
 
@@ -42,17 +47,6 @@ export default function Login() {
             placeholder="Ingrese su contraseña"
           />
         </label>
-
-        <div className="mb-4 text-left">
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate("/register")}
-            className="text-blue-800 hover:text-violet-700 cursor-pointer font-body inline-block"
-          >
-            Registrarse
-          </span>
-        </div>
 
         <div className="flex items-center justify-center">
           <button

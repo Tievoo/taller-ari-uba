@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { login, register } from './utils';
+import { auth } from '../middleware/auth';
 
 const router = Router();
 
@@ -10,12 +11,11 @@ router.post('/login', async (req, res, next) => {
         res.cookie('access_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 12 * 60 * 60 * 1000
         })
         res.status(200).json({ message: 'Login successful' });
     } catch (error) {
-        console.error('Login error:', error);
         next(error);
     }
 });
@@ -27,7 +27,7 @@ router.post('/register', async (req, res, next) => {
         res.cookie('access_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 12 * 60 * 60 * 1000
         });
         res.status(201).json({ message: 'User registered successfully' });
@@ -35,6 +35,16 @@ router.post('/register', async (req, res, next) => {
         console.error('Registration error:', error);
         next(error);
     }
+});
+
+router.get('/me', auth({}), (req, res) => {
+    const { password, ...userWithoutPassword } = req.user!;
+    res.status(200).json(userWithoutPassword);
+});
+
+router.post('/logout', (req, res) => {
+    res.clearCookie('access_token');
+    res.status(200).json({ message: 'Logged out successfully' });
 });
 
 export default router;
