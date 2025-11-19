@@ -4,11 +4,11 @@ VALUES
     ('futbol7', 'Futbol 7', 86000),
     ('tenis', 'Tenis', 30000);
 
-INSERT INTO courts (id, name, court_type_id)
+INSERT INTO courts (id, name, court_type_id, image)
 VALUES
-    ('cancha-f5-1', 'Futbol 5 - 1', 'futbol5'),
-    ('cancha-f5-2', 'Futbol 5 - 2', 'futbol5'),
-    ('cancha-t1', 'Tenis - 1', 'tenis');
+    ('cancha-f5-1', 'Futbol 5 - Fondo', 'futbol5', 'https://i.imgur.com/crzlN8O.jpeg'),
+    ('cancha-f5-2', 'Futbol 5 - Techada', 'futbol5', 'https://i.imgur.com/hOsDHeq.png'),
+    ('cancha-t1', 'Tenis - 1', 'tenis', 'https://i.imgur.com/WdkoKDm.png');
 
 -- Password is 'test' hashed with bcrypt
 INSERT INTO users (email, first_name, last_name, password, role)
