@@ -1,5 +1,6 @@
-import type { FC } from "react";
-import type { Schedule, Court } from "../../types/ReservationTypes";
+import { type FC } from "react";
+import type { Schedule } from "../../types/ReservationTypes";
+import type { Court } from "../../api/courts";
 
 interface ConfirmationProps {
     court: Court;
@@ -7,6 +8,7 @@ interface ConfirmationProps {
     selectedTime: Schedule | null;
     onGoBackToSelection: () => void;
     onConfirmReservation: () => void;
+    loading?: boolean;
 }
 
 const Confirmation: FC<ConfirmationProps> = ({
@@ -15,6 +17,7 @@ const Confirmation: FC<ConfirmationProps> = ({
     selectedTime,
     onGoBackToSelection,
     onConfirmReservation,
+    loading = false,
 }) => {
     return (
         <>
@@ -39,14 +42,16 @@ const Confirmation: FC<ConfirmationProps> = ({
                         <span className="font-medium text-gray-700">Hora:</span>
                         <span>{selectedTime?.start_time}</span>
                     </div>
-                    {court.price && (
-                        <div className="flex justify-between">
-                            <span className="font-medium text-gray-700">
-                                Precio:
-                            </span>
-                            <span>${court.price.toLocaleString()} /hora</span>
-                        </div>
-                    )}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-gray-900">
+                            Total a pagar:
+                        </span>
+                        <span className="text-2xl font-bold text-primary-600">
+                            ${court.price.toLocaleString()}
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -59,9 +64,10 @@ const Confirmation: FC<ConfirmationProps> = ({
                 </button>
                 <button
                     onClick={onConfirmReservation}
-                    className="flex-1 py-2 px-4 rounded-md font-medium transition-colors bg-green-600 text-white hover:bg-green-700"
+                    disabled={loading}
+                    className="flex-1 py-2 px-4 rounded-md font-medium transition-colors bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Confirmar Reserva
+                    {loading ? 'Confirmando...' : 'Confirmar Reserva'}
                 </button>
             </div>
         </>

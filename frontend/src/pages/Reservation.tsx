@@ -1,96 +1,30 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
 import {
     DateSelection,
     ScheduleSelection,
     Confirmation,
 } from "../components/reservation";
-import type { Schedule } from "../types/ReservationTypes";
-import { courtsApi, type Court } from "../api/courts";
+import { useReservationFlow } from "../hooks/useReservationFlow";
 
 export default function Reservation() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    
-    const [court, setCourt] = useState<Court | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    
-    const [selectedDate, setSelectedDate] = useState("");
-    const [showSchedules, setShowSchedules] = useState(false);
-    const [selectedTime, setSelectedTime] = useState<Schedule | null>(null);
-    const [showConfirmation, setShowConfirmation] = useState(false);
-
-    // Hardcoded schedules for now
-    const schedules: Schedule[] = [
-        { id: 1, start_time: "09:00", end_time: "10:00", available: true },
-        { id: 2, start_time: "10:00", end_time: "11:00", available: false },
-        { id: 3, start_time: "11:00", end_time: "12:00", available: true },
-        { id: 4, start_time: "12:00", end_time: "13:00", available: true },
-        { id: 5, start_time: "13:00", end_time: "14:00", available: false },
-        { id: 6, start_time: "14:00", end_time: "15:00", available: true },
-        { id: 7, start_time: "15:00", end_time: "16:00", available: false },
-        { id: 8, start_time: "16:00", end_time: "17:00", available: true },
-        { id: 9, start_time: "17:00", end_time: "18:00", available: true },
-        { id: 10, start_time: "18:00", end_time: "19:00", available: false },
-        { id: 11, start_time: "19:00", end_time: "20:00", available: true },
-        { id: 12, start_time: "20:00", end_time: "21:00", available: false },
-        { id: 13, start_time: "21:00", end_time: "22:00", available: true },
-        { id: 14, start_time: "22:00", end_time: "23:00", available: true },
-    ];
-
-    useEffect(() => {
-        const fetchCourt = async () => {
-            if (!id) {
-                setError("No se especificó una cancha");
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const { data } = await courtsApi.getById(id);
-                setCourt(data);
-            } catch (err) {
-                setError("Error al cargar la cancha");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCourt();
-    }, [id]);
-
-    const handleViewSchedules = () => {
-        if (selectedDate) {
-            setShowSchedules(true);
-        }
-    };
-
-    const handleReserveTime = (schedule: Schedule) => {
-        setSelectedTime(schedule);
-        setShowConfirmation(true);
-    };
-
-    const handleCancel = () => {
-        navigate(-1);
-    };
-
-    const handleGoBack = () => {
-        setShowSchedules(false);
-    };
-
-    const handleConfirmReservation = () => {
-        console.log(
-            `Reservando ${court.name} para el ${selectedDate} a las ${selectedTime?.start_time}`
-        );
-        navigate(-1);
-    };
-
-    const handleGoBackToSelection = () => {
-        setShowConfirmation(false);
-        setSelectedTime(null);
-    };
+    const {
+        court,
+        loading,
+        error,
+        selectedDate,
+        setSelectedDate,
+        selectedTime,
+        schedules,
+        loadingSchedules,
+        bookingInProgress,
+        currentStep,
+        goToSchedules,
+        selectTimeSlot,
+        goBackToSchedules,
+        goBackToDate,
+        confirmReservation,
+        cancel,
+        goHome,
+    } = useReservationFlow();
 
     if (loading) {
         return (
@@ -106,7 +40,7 @@ export default function Reservation() {
                 <div className="text-center">
                     <p className="text-red-500 text-lg mb-4">{error || "No se encontró la cancha"}</p>
                     <button
-                        onClick={() => navigate("/")}
+                        onClick={goHome}
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                         Volver al inicio
@@ -117,20 +51,20 @@ export default function Reservation() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-3xl mx-auto px-4">
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="min-h-screen-nav bg-gray-50 flex items-center justify-center p-4">
+            <div className="max-w-3xl w-full">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden max-h-[calc(100vh-5rem)]">
                     {/* Court Header */}
-                    <div className="relative h-64 md:h-80">
+                    <div className="relative h-48">
                         <img
                             src={court.image || "/placeholder-cancha.jpg"}
                             alt={court.name}
                             className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                         <div className="absolute bottom-0 left-0 right-0 p-6">
                             <button
-                                onClick={handleCancel}
+                                onClick={cancel}
                                 className="mb-4 flex items-center text-white hover:text-gray-200 transition"
                             >
                                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,31 +89,54 @@ export default function Reservation() {
                     </div>
 
                     {/* Reservation Content */}
-                    <div className="p-6 md:p-8">
-                        {!showSchedules && !showConfirmation ? (
+                    <div className="p-6 md:p-8 overflow-y-auto">
+                        {currentStep === 'date' && (
                             <DateSelection
                                 selectedDate={selectedDate}
                                 setSelectedDate={setSelectedDate}
-                                onViewSchedules={handleViewSchedules}
-                                onCancel={handleCancel}
+                                onViewSchedules={goToSchedules}
+                                onCancel={cancel}
                             />
-                        ) : showSchedules && !showConfirmation ? (
+                        )}
+
+                        {currentStep === 'schedules' && (
                             <ScheduleSelection
                                 selectedDate={selectedDate}
                                 schedules={schedules}
-                                onReserveTime={handleReserveTime}
-                                onGoBack={handleGoBack}
-                                onCancel={handleCancel}
+                                onReserveTime={selectTimeSlot}
+                                onGoBack={goBackToDate}
+                                loading={loadingSchedules}
                             />
-                        ) : showConfirmation ? (
+                        )}
+
+                        {currentStep === 'confirmation' && (
                             <Confirmation
                                 court={court}
                                 selectedDate={selectedDate}
                                 selectedTime={selectedTime}
-                                onGoBackToSelection={handleGoBackToSelection}
-                                onConfirmReservation={handleConfirmReservation}
+                                onGoBackToSelection={goBackToSchedules}
+                                onConfirmReservation={confirmReservation}
+                                loading={bookingInProgress}
                             />
-                        ) : null}
+                        )}
+
+                        {currentStep === 'success' && (
+                            <div className="text-center py-8">
+                                <div className="mb-4 text-green-600">
+                                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-4">¡Reserva confirmada!</h2>
+                                <p className="text-gray-600 mb-6">Tu reserva ha sido creada exitosamente.</p>
+                                <button
+                                    onClick={goHome}
+                                    className="px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                                >
+                                    Volver al inicio
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

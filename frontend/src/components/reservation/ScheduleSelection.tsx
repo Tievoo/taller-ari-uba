@@ -6,7 +6,7 @@ interface ScheduleSelectionProps {
     schedules: Schedule[];
     onReserveTime: (schedule: Schedule) => void;
     onGoBack: () => void;
-    onCancel: () => void;
+    loading?: boolean;
 }
 
 const ScheduleSelection: FC<ScheduleSelectionProps> = ({
@@ -14,7 +14,7 @@ const ScheduleSelection: FC<ScheduleSelectionProps> = ({
     schedules,
     onReserveTime,
     onGoBack,
-    onCancel,
+    loading = false,
 }) => {
     return (
         <>
@@ -25,8 +25,17 @@ const ScheduleSelection: FC<ScheduleSelectionProps> = ({
                 <p className="text-sm font-medium text-gray-700 mb-4">
                     Horarios disponibles:
                 </p>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {schedules.map((schedule) => (
+                {loading ? (
+                    <div className="text-center py-8 text-gray-500">
+                        Cargando horarios...
+                    </div>
+                ) : schedules.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                        No hay horarios disponibles para esta fecha
+                    </div>
+                ) : (
+                    <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                        {schedules.map((schedule) => (
                         <div
                             key={schedule.start_time}
                             className="flex items-center justify-between p-3 border border-gray-200 rounded-md"
@@ -48,14 +57,15 @@ const ScheduleSelection: FC<ScheduleSelectionProps> = ({
                             {schedule.available && (
                                 <button
                                     onClick={() => onReserveTime(schedule)}
-                                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                                    className="px-3 py-1 font-semibold bg-primary-600 text-white text-sm rounded-md hover:bg-primary-700 transition-colors"
                                 >
                                     Reservar
                                 </button>
                             )}
                         </div>
                     ))}
-                </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex gap-3">
@@ -64,12 +74,6 @@ const ScheduleSelection: FC<ScheduleSelectionProps> = ({
                     className="flex-1 py-2 px-4 border border-gray-300 rounded-md font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                     Volver
-                </button>
-                <button
-                    onClick={onCancel}
-                    className="flex-1 py-2 px-4 border border-gray-300 rounded-md font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                    Cancelar
                 </button>
             </div>
         </>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link, useLocation } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Register() {
@@ -11,6 +11,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from || "/";
 
   const registerHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function Register() {
         first_name: firstName, 
         last_name: lastName 
       });
-      navigate("/");
+      navigate(from);
     } catch (err) {
       setError("Error al registrarse. Intentá de nuevo.");
     } finally {
@@ -119,8 +121,8 @@ export default function Register() {
 
             <div className="text-center text-sm text-gray-600">
               ¿Ya tenés cuenta?{" "}
-              <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
-                Iniciá sesión
+              <Link to="/login" state={{ from }} className="text-primary-600 hover:text-primary-700 font-semibold">
+                Iniciá sesión acá
               </Link>
             </div>
           </form>

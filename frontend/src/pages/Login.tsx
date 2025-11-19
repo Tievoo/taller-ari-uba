@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link, useLocation } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
@@ -9,6 +9,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from || "/";
 
   const loginHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +19,7 @@ export default function Login() {
     
     try {
       await login({ email, password });
-      navigate("/");
+      navigate(from);
     } catch (err) {
       setError("Email o contraseña incorrectos");
     } finally {
@@ -81,7 +83,7 @@ export default function Login() {
 
             <div className="text-center text-sm text-gray-600">
               ¿No tenés cuenta?{" "}
-              <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold">
+              <Link to="/register" state={{ from }} className="text-primary-600 hover:text-primary-700 font-semibold">
                 Registrate acá
               </Link>
             </div>

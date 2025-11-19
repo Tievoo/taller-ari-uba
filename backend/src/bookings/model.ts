@@ -32,4 +32,12 @@ export class BookingModel {
             VALUES ($1, $2, $3, $4, $5) RETURNING *`, [user_id, court_id, booking_date, start_time, end_time])
         return result.rows[0] as Booking;
     }
+
+    static async getByCourtAndDate(court_id: string, booking_date: string) {
+        const result = await dbClient.query(
+            'SELECT * FROM bookings WHERE court_id = $1 AND booking_date = $2',
+            [court_id, booking_date]
+        );
+        return result.rows as Booking[];
+    }
 }

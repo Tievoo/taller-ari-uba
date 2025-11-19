@@ -10,7 +10,7 @@ export type Court = {
 
 export class CourtModel {
     static async findById(id: string) {
-        const result = await dbClient.query('SELECT * FROM courts WHERE id = $1', [id]);
+        const result = await dbClient.query('SELECT c.*, ct.name as court_type_name, ct.price FROM courts c JOIN court_type ct ON c.court_type_id = ct.id WHERE c.id = $1', [id]);
         return result.rows[0] as Court | null;
     }
 
