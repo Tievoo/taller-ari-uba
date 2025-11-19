@@ -25,6 +25,7 @@ CREATE TABLE courts (
     id TEXT PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     court_type_id TEXT REFERENCES court_type(id),
+    image TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
