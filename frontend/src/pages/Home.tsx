@@ -1,14 +1,7 @@
-interface Cancha {
-    id: string;
-    name: string;
-    court_type_id: string;
-    court_type_name?: string;
-    price?: number;
-    img: string;
-}
+import type { Court } from "../types/ReservationTypes";
 import Card from "../components/Card";
 
-const canchas: Cancha[] = [
+const courts: Court[] = [
     {
         id: "1",
         name: "Cancha Fútbol",
@@ -52,19 +45,20 @@ export default function Home() {
                 </h1>
 
                 <div className="space-y-6">
-                    {canchas.map((cancha) => (
+                    {courts.map((court) => (
                         <Card
-                            key={cancha.id}
-                            id={cancha.id}
-                            name={cancha.name}
-                            price={cancha.price}
-                            img={cancha.img}
-                            court_type_name={cancha.court_type_name}
+                            key={court.id}
+                            id={court.id}
+                            name={court.name}
+                            price={court.price}
+                            img={court.img}
+                            court_type_name={court.court_type_name}
+                            court_type_id={court.court_type_id}
                         />
                     ))}
                 </div>
 
-                {canchas.length === 0 && (
+                {courts.length === 0 && (
                     <div className="text-center py-12">
                         <p className="text-gray-500 text-lg">
                             No hay canchas disponibles en este momento
