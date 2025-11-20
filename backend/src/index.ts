@@ -21,6 +21,7 @@ app.get("/ping", (_, res: Response) => {
 app.use('/auth', require('./auth/routes').default);
 app.use('/courts', require('./courts/routes').default);
 app.use('/bookings', require('./bookings/routes').default);
+app.use('/admin', require('./admin/routes').default);
 
 app.use(errorHandler);
 
