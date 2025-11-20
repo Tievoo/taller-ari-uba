@@ -22,7 +22,7 @@ export function createCrudRouter<T>(
 
     const shouldInclude = (operation: string) => !only || only.includes(operation as any);
     
-    const authMiddleware: RequestHandler = requireAuth 
+    const authMiddleware: RequestHandler = (requireAuth || requireAdmin) 
         ? auth({ admin: requireAdmin }) 
         : (req, res, next) => next();
 

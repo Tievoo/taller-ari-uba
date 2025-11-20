@@ -7,24 +7,9 @@ import { UserModel } from '../users/model';
 
 const router = Router();
 
-router.use('/courts', createCrudRouter(CourtModel, { 
-    requireAuth: true, 
-    requireAdmin: true 
-}));
-
-router.use('/court-types', createCrudRouter(CourtTypeModel, { 
-    requireAuth: true, 
-    requireAdmin: true 
-}));
-
-router.use('/bookings', createCrudRouter(BookingModel, { 
-    requireAuth: true, 
-    requireAdmin: true 
-}));
-
-router.use('/users', createCrudRouter(UserModel, { 
-    requireAuth: true, 
-    requireAdmin: true 
-}));
+router.use('/users', createCrudRouter(UserModel, { requireAdmin: true }));
+router.use('/courts', createCrudRouter(CourtModel, { requireAdmin: true }));
+router.use('/bookings', createCrudRouter(BookingModel, { requireAdmin: true }));
+router.use('/court-types', createCrudRouter(CourtTypeModel, { requireAdmin: true }));
 
 export default router;
