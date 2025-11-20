@@ -1,4 +1,4 @@
-import { dbClient } from "../database/db";
+import { BaseModel } from "../base/BaseModel";
 
 export type CourtType = {
     id: string;
@@ -6,15 +6,4 @@ export type CourtType = {
     price: number;
 };
 
-export class CourtTypeModel {
-    static async findById(id: string) {
-        const result = await dbClient.query('SELECT * FROM court_type WHERE id = $1', [id]);
-        return result.rows[0] as CourtType | null;
-    }
-
-    static async getAll() {
-        const result = await dbClient.query('SELECT * FROM court_type');
-        return result.rows as CourtType[];
-    }
-
-}
+export const CourtTypeModel = new BaseModel<CourtType>('court_type');
