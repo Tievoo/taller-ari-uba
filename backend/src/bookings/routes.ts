@@ -4,13 +4,15 @@ import { BookingModel } from "./model";
 
 const router = Router();
 
-router.get('/', auth({}), async (req, res) => {
+router.use(auth({}));
+
+router.get('/', async (req, res) => {
     const user = req.user;
     const bookings = await BookingModel.getByUserId(user.id);
     return res.json(bookings);
 });
 
-router.post('/', auth({}), async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     const user = req.user;
     const { court_id, booking_date, start_time } = req.body;
     try {
