@@ -2,7 +2,7 @@ import { BaseModel } from "../base/BaseModel";
 import { dbClient } from "../database/db";
 
 export type User = {
-    id: string;
+    id: number;
     email: string;
     first_name: string;
     last_name: string;

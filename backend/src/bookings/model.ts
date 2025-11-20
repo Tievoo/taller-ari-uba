@@ -16,12 +16,12 @@ class BookingModelClass extends BaseModel<Booking> {
         super('bookings');
     }
 
-    async getByUserId(user_id: string) {
+    async getByUserId(user_id: number) {
         const result = await dbClient.query('SELECT * FROM bookings WHERE user_id = $1', [user_id]);
         return result.rows as Booking[];
     }
 
-    async create(data: Partial<Booking> & { user_id: string, court_id: string, booking_date: string, start_time: string }) {
+    async create(data: Omit<Booking, 'id' | 'end_time' | 'created_at'>): Promise<Booking> {
         const end_time = `${(parseInt(data.start_time.split(':')[0]!) + 1).toString().padStart(2, '0')}:${data.start_time.split(':')[1]}`;
         const result = await dbClient.query(
             `INSERT INTO bookings (user_id, court_id, booking_date, start_time, end_time) 
