@@ -26,6 +26,8 @@ export function createCrudRouter<T>(
         ? auth({ admin: requireAdmin }) 
         : (req, res, next) => next();
 
+    router.use(authMiddleware);
+
     if (shouldInclude('getAll')) {
         router.get('/', async (req, res, next) => {
             try {
@@ -52,7 +54,7 @@ export function createCrudRouter<T>(
     }
 
     if (shouldInclude('create')) {
-        router.post('/', authMiddleware, async (req, res, next) => {
+        router.post('/', async (req, res, next) => {
             try {
                 const item = await model.create(req.body);
                 res.status(201).json(item);
@@ -63,7 +65,7 @@ export function createCrudRouter<T>(
     }
 
     if (shouldInclude('update')) {
-        router.put('/:id', authMiddleware, async (req, res, next) => {
+        router.put('/:id', async (req, res, next) => {
             try {
                 const { id } = req.params;
                 if (!id) return next(new Error(ErrorType.BadRequest));
@@ -80,7 +82,7 @@ export function createCrudRouter<T>(
     }
 
     if (shouldInclude('delete')) {
-        router.delete('/:id', authMiddleware, async (req, res, next) => {
+        router.delete('/:id', async (req, res, next) => {
             try {
                 const { id } = req.params;
                 if (!id) return next(new Error(ErrorType.BadRequest));
