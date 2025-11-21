@@ -29,4 +29,16 @@ router.post('/', async (req, res, next) => {
     }
 });
 
+router.delete('/:id', async (req, res, next) => {
+    const user = req.user;
+    const bookingId = parseInt(req.params.id);
+    try {
+        await BookingModel.deleteBooking(bookingId, user.id);
+        return res.status(204).send();
+    } catch (error) {
+        console.error('Error deleting booking:', error);
+        next(error);
+    }
+});
+
 export default router;

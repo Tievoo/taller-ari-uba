@@ -8,7 +8,8 @@ export type Booking = {
     booking_date: string,
     start_time: string,
     end_time: string,
-    created_at: Date
+    created_at: Date,
+    court_name?: string
 };
 
 class BookingModelClass extends BaseModel<Booking> {
@@ -17,7 +18,14 @@ class BookingModelClass extends BaseModel<Booking> {
     }
 
     async getByUserId(user_id: number) {
-        const result = await dbClient.query('SELECT * FROM bookings WHERE user_id = $1', [user_id]);
+        const result = await dbClient.query(
+            `SELECT b.*, c.name as court_name 
+             FROM bookings b 
+             JOIN courts c ON b.court_id = c.id 
+             WHERE b.user_id = $1 
+             ORDER BY b.booking_date DESC, b.start_time DESC`, 
+            [user_id]
+        );
         return result.rows as Booking[];
     }
 
@@ -37,6 +45,17 @@ class BookingModelClass extends BaseModel<Booking> {
             [court_id, booking_date]
         );
         return result.rows as Booking[];
+    }
+
+    async deleteBooking(id: number, user_id: number) {
+        const result = await dbClient.query(
+            'DELETE FROM bookings WHERE id = $1 AND user_id = $2 RETURNING *',
+            [id, user_id]
+        );
+        if (result.rowCount === 0) {
+            throw new Error('Booking not found or unauthorized');
+        }
+        return result.rows[0] as Booking;
     }
 }
 
