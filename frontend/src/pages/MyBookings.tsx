@@ -43,7 +43,6 @@ export default function MyBookings() {
     };
 
     const pastBookings = bookings.filter(b => isPast(b.booking_date, b.start_time));
-    console.log('Past Bookings:', pastBookings);
     const futureBookings = bookings.filter(b => !isPast(b.booking_date, b.start_time));
 
     if (loading) {
@@ -108,10 +107,6 @@ export default function MyBookings() {
 }
 
 function BookingCard({ booking, handleCancel }: { booking: Booking, handleCancel: (id: number) => void }) {
-
-    useEffect(() => {
-        console.log(booking.booking_date, booking.start_time, isPast(booking.booking_date, booking.start_time));
-    }, []);
     return (
         <div key={booking.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
             <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-start">
