@@ -14,6 +14,7 @@ export interface Booking {
   start_time: string;
   end_time: string;
   created_at: Date;
+  court_name?: string;
 }
 
 export const bookingsApi = {
@@ -22,4 +23,7 @@ export const bookingsApi = {
   
   getAll: () => 
     apiClient.get<Booking[]>('/bookings'),
+
+  delete: (id: number) =>
+    apiClient.delete(`/bookings/${id}`),
 };
