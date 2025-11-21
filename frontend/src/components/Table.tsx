@@ -3,9 +3,16 @@ import { type TableType } from "../api/admin";
 interface TableProps {
   tableType: TableType;
   data: any[];
+  onDelete: (id: string | number) => void;
+  onEdit: (row: any) => void;
 }
 
-export default function Table({ tableType, data }: TableProps) {
+export default function Table({
+  tableType,
+  data,
+  onDelete,
+  onEdit,
+}: TableProps) {
   const getTableConfig = () => {
     switch (tableType) {
       case "users":
@@ -77,6 +84,7 @@ export default function Table({ tableType, data }: TableProps) {
                 {header}
               </th>
             ))}
+            <th className="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -87,6 +95,28 @@ export default function Table({ tableType, data }: TableProps) {
                   {row[key]}
                 </td>
               ))}
+              <td className="py-2 px-4 border">
+                <button
+                  onClick={() => onEdit(row)}
+                  className="px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 mr-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this item?"
+                      )
+                    ) {
+                      onDelete(row.id);
+                    }
+                  }}
+                  className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

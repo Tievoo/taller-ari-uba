@@ -50,4 +50,10 @@ const getEndpoint = (tableType: TableType) => {
 export const adminApi = {
   getTable: (tableType: TableType) =>
     apiClient.get<any[]>(getEndpoint(tableType)),
+  createTable: (tableType: TableType, data: any) =>
+    apiClient.post(getEndpoint(tableType), data),
+  updateTable: (tableType: TableType, id: string | number, data: any) =>
+    apiClient.put(`${getEndpoint(tableType)}/${id}`, data),
+  deleteTable: (tableType: TableType, id: string | number) =>
+    apiClient.delete(`${getEndpoint(tableType)}/${id}`),
 };
