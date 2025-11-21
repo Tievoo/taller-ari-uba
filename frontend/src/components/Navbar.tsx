@@ -7,13 +7,11 @@ export default function Navbar() {
   return (
     <nav className="bg-linear-to-r from-primary-600 to-primary-700 text-white shadow-xl backdrop-blur-sm sticky top-0 z-50">
       <div className=" px-3 sm:px-4 py-3 sm:py-4 flex justify-between items-center">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="text-lg sm:text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity duration-200"
         >
-          <span className="text-white">
-            Alquiler de Canchas
-          </span>
+          <span className="text-white">Alquiler de Canchas</span>
         </Link>
         <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
@@ -30,6 +28,14 @@ export default function Navbar() {
               >
                 Mis Reservas
               </Link>
+              {user.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 hover:shadow-lg border border-white/20"
+                >
+                  Admin
+                </Link>
+              )}
               <button
                 onClick={logout}
                 className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 hover:shadow-lg border border-white/20"

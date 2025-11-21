@@ -5,19 +5,21 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reservation from "./pages/Reservation";
 import MyBookings from "./pages/MyBookings";
+import Admin from "./pages/Admin";
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <RootLayout />,
-        children: [
-            { index: true, element: <Home /> },
-            { path: "login", element: <Login /> },
-            { path: "register", element: <Register /> },
-            { path: "reservation/:id", element: <Reservation /> },
-            { path: "my-bookings", element: <MyBookings /> },
-        ],
-    },
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "reservation/:id", element: <Reservation /> },
+      { path: "my-bookings", element: <MyBookings /> },
+      { path: "admin", element: <Admin /> },
+    ],
+  },
 ]);
 
 export default router;
