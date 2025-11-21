@@ -6,7 +6,16 @@ import { ErrorType } from '../middleware/error-handler';
 
 const router = Router();
 
-router.use(createCrudRouter(CourtModel, { only: ['getAll', 'getById'] }));
+router.use(createCrudRouter(CourtModel, { only: ['findById'] }));
+
+router.get('/', async (req, res, next) => {
+    try {
+        const courts = await CourtModel.findAllFull();
+        res.json(courts);
+    } catch (error) {
+        next(error);
+    }
+})
 
 router.get('/:id/availability', async (req, res, next) => {
     const { id } = req.params;
@@ -17,7 +26,7 @@ router.get('/:id/availability', async (req, res, next) => {
             return res.status(400).json({ error: 'Date query parameter is required (format: YYYY-MM-DD)' });
         }
 
-        const court = await CourtModel.findById(id);
+        const court = await CourtModel.findFullById(id);
         if (!court) {
             return next(new Error(ErrorType.NotFound));
         }

@@ -56,11 +56,19 @@ export default function Reservation() {
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden max-h-[calc(100vh-5rem)]">
                     {/* Court Header */}
                     <div className="relative h-48">
-                        <img
-                            src={court.image || "/placeholder-cancha.jpg"}
-                            alt={court.name}
-                            className="w-full h-full object-cover"
-                        />
+                        {
+                            court.image ? (
+                                <img
+                                    src={court.image}
+                                    alt={court.name}
+                                    className="inset-0 w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-40 md:h-48 object-cover flex items-center justify-center">
+                                    <span className="text-gray-500 text-xl">Sin imagen disponible</span>
+                                </div>
+                            )
+                        }
                         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                         <div className="absolute bottom-0 left-0 right-0 p-6">
                             <button

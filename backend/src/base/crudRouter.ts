@@ -6,7 +6,7 @@ import { auth } from '../middleware/auth';
 interface CrudOptions {
     requireAuth?: boolean;
     requireAdmin?: boolean;
-    only?: ('getAll' | 'getById' | 'create' | 'update' | 'delete')[];
+    only?: ('findAll' | 'findById' | 'create' | 'update' | 'delete')[];
 }
 
 export function createCrudRouter<T>(
@@ -28,10 +28,10 @@ export function createCrudRouter<T>(
 
     router.use(authMiddleware);
 
-    if (shouldInclude('getAll')) {
+    if (shouldInclude('findAll')) {
         router.get('/', async (req, res, next) => {
             try {
-                const items = await model.getAll();
+                const items = await model.findAll();
                 res.json(items);
             } catch (error) {
                 next(error);
@@ -39,7 +39,7 @@ export function createCrudRouter<T>(
         });
     }
 
-    if (shouldInclude('getById')) {
+    if (shouldInclude('findById')) {
         router.get('/:id', async (req, res, next) => {
             try {
                 const item = await model.findById(req.params.id);

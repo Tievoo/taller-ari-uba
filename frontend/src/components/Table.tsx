@@ -17,43 +17,23 @@ export default function Table({
     switch (tableType) {
       case "users":
         return {
-          headers: [
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-            "password",
-            "google_id",
-            "created_at",
-            "role",
-          ],
           keys: [
             "id",
             "email",
             "first_name",
             "last_name",
             "password",
-            "google_id",
+            // "google_id",
             "created_at",
             "role",
           ],
         };
       case "courts":
         return {
-          headers: ["id", "name", "court_type_id", "image", "created_at"],
           keys: ["id", "name", "court_type_id", "image", "created_at"],
         };
       case "bookings":
         return {
-          headers: [
-            "id",
-            "user_id",
-            "court_id",
-            "booking_date",
-            "start_time",
-            "end_time",
-            "created_at",
-          ],
           keys: [
             "id",
             "user_id",
@@ -66,22 +46,21 @@ export default function Table({
         };
       case "court-types":
         return {
-          headers: ["id", "name", "price"],
           keys: ["id", "name", "price"],
         };
     }
   };
 
-  const { headers, keys } = getTableConfig();
+  const { keys } = getTableConfig();
 
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         <thead>
           <tr className="bg-primary-50 border-b border-gray-200">
-            {headers.map((header) => (
-              <th key={header} className="py-4 px-6 text-left text-sm font-semibold text-primary-800 uppercase tracking-wider">
-                {header.replace('_', ' ')}
+            {keys.map((key) => (
+              <th key={key} className="py-4 px-6 text-left text-sm font-semibold text-primary-800 uppercase tracking-wider">
+                {key.replaceAll('_', ' ')}
               </th>
             ))}
             <th className="py-4 px-6 text-left text-sm font-semibold text-primary-800 uppercase tracking-wider">

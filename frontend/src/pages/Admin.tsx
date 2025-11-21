@@ -50,12 +50,17 @@ export default function Admin() {
 
   useEffect(() => {
     fetchData("users");
-    // Fetch court types for select
-    adminApi
+    setSelectedTable("users");
+  }, []);
+
+  useEffect(() => {
+    if (selectedTable === "courts") {
+      adminApi
       .getTable("court-types")
       .then((res) => setCourtTypes(res.data))
       .catch(() => {});
-  }, []);
+    }
+  }, [selectedTable]);
 
   const handleTableSelect = (tableType: TableType) => {
     setSelectedTable(tableType);
@@ -192,7 +197,7 @@ export default function Admin() {
                         <option value="">Select Court Type</option>
                         {courtTypes.map((ct: any) => (
                           <option key={ct.id} value={ct.id}>
-                            {ct.name}
+                            {ct.name} - {ct.id}
                           </option>
                         ))}
                       </select>
@@ -213,7 +218,8 @@ export default function Admin() {
                           [field]: e.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      disabled={editing && field === "id"}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-200"
                     />
                   </div>
                 );
