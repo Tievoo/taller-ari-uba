@@ -13,7 +13,6 @@ export type User = {
 class UserModelClass extends BaseModel<User> {
     constructor() {
         super('users');
-        this.addCascadeDependency('bookings', 'user_id');
     }
 
     async findByEmail(email: string) {

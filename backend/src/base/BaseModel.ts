@@ -6,13 +6,7 @@ type CascadeDependency = {
 };
 
 export class BaseModel<T> {
-  private cascadeDependencies: CascadeDependency[] = [];
-
   constructor(protected tableName: string, protected idColumn: string = "id") {}
-
-  protected addCascadeDependency(tableName: string, foreignKey: string): void {
-    this.cascadeDependencies.push({ tableName, foreignKey });
-  }
 
   private sanitizeIdentifier(identifier: string): string {
     if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(identifier)) {
@@ -68,15 +62,6 @@ export class BaseModel<T> {
   }
 
   async delete(id: string | number): Promise<boolean> {
-    for (const dependency of this.cascadeDependencies) {
-      const sanitizedTable = this.sanitizeIdentifier(dependency.tableName);
-      const sanitizedFK = this.sanitizeIdentifier(dependency.foreignKey);
-      await dbClient.query(
-        `DELETE FROM ${sanitizedTable} WHERE ${sanitizedFK} = $1`,
-        [id]
-      );
-    }
-
     const result = await dbClient.query(
       `DELETE FROM ${this.tableName} WHERE ${this.idColumn} = $1`,
       [id]

@@ -9,7 +9,6 @@ export type CourtType = {
 class CourtTypeModelClass extends BaseModel<CourtType> {
     constructor() {
         super('court_type');
-        this.addCascadeDependency('courts', 'court_type_id');
     }
 }
 

@@ -15,7 +15,6 @@ export type FullCourt = Court & {
 class CourtModelClass extends BaseModel<Court> {
     constructor() {
         super('courts');
-        this.addCascadeDependency('bookings', 'court_id');
     }
 
     async findFullById(id: string) {
