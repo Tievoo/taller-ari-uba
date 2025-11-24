@@ -4,7 +4,7 @@
 
 Como runtime, usamos [bun](https://bun.com/), una alternativa general a Node. El proyecto fue desarrollado con el mismo. 
 
-### Backend:
+### Backend `cd backend`:
 Instalar dependencias
 ```bash
 bun install
@@ -26,7 +26,7 @@ bun dev
 ```
 
 
-### Frontend
+### Frontend `cd frontend`
 Instalar dependencias
 ```bash
 bun install
