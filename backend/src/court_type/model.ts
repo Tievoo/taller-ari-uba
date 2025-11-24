@@ -6,4 +6,10 @@ export type CourtType = {
     price: number;
 };
 
-export const CourtTypeModel = new BaseModel<CourtType>('court_type');
+class CourtTypeModelClass extends BaseModel<CourtType> {
+    constructor() {
+        super('court_type');
+    }
+}
+
+export const CourtTypeModel = new CourtTypeModelClass();

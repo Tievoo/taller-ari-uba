@@ -24,15 +24,15 @@ CREATE TABLE court_type (
 CREATE TABLE courts (
     id TEXT PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
-    court_type_id TEXT REFERENCES court_type(id),
+    court_type_id TEXT REFERENCES court_type(id) ON DELETE CASCADE,
     image TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE bookings (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
-    court_id TEXT REFERENCES courts(id),
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    court_id TEXT REFERENCES courts(id) ON DELETE CASCADE,
     booking_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,

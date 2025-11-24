@@ -1,20 +1,18 @@
 import { useNavigate } from "react-router";
+import type { Court } from "../api/courts";
 
 export default function Card({
-    id,
-    name,
-    price,
-    image,
-    court_type_name,
-}: {
-    id: string;
-    name: string;
-    price?: number;
-    image?: string;
-    court_type_name?: string;
-    court_type_id: string;
-}) {
+    court,
+}: { court: Court }) {
     const navigate = useNavigate();
+
+    const {
+        id,
+        name,
+        price,
+        image,
+        court_type_name,
+    } = court
 
     const handleReserveClick = () => {
         navigate(`/reservation/${id}`);
@@ -27,11 +25,19 @@ export default function Card({
         >
             <div className="md:flex">
                 <div className="md:w-1/3 md:h-48">
-                    <img
-                        src={image || "/placeholder-cancha.jpg"}
-                        alt={name}
-                        className="w-full h-40 md:h-48 object-cover"
-                    />
+                    {
+                        image ? (
+                            <img    
+                                src={image}
+                                alt={name}
+                                className="inset-0 w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-40 md:h-48 object-cover flex items-center justify-center">
+                                <span className="text-gray-500 text-xl">Sin imagen disponible</span>
+                            </div>
+                        )
+                    }
                 </div>
 
                 <div className="md:w-2/3 p-6 flex flex-col justify-between">

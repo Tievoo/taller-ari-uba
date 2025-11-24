@@ -59,14 +59,7 @@ export default function Home() {
                 <div className="space-y-6">
                     {courts.map((court) => (
                         <div key={court.id}>
-                            <Card
-                                id={court.id}
-                                name={court.name}
-                                price={court.price}
-                                image={court.image}
-                                court_type_name={court.court_type_name}
-                                court_type_id={court.court_type_id}
-                            />
+                            <Card court={court} />
                         </div>
                     ))}
                 </div>

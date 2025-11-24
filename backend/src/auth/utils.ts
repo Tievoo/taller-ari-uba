@@ -31,6 +31,6 @@ export async function register(user: Omit<User, "id">): Promise<string> {
         throw new Error("Email already in use");
     }
     const hashedPassword = await bcrypt.hash(user.password, 10);
-    const newUser = await UserModel.create({ ...user, password: hashedPassword });
+    const newUser = await UserModel.create({ ...user, password: hashedPassword, role: user.role || 'user' });
     return generateAuthToken(newUser);
 }
