@@ -12,6 +12,12 @@ jobs:
       backend_changed: ${{ steps.check.outputs.backend_changed }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - id: check
         run: |
@@ -27,6 +33,12 @@ jobs:
       frontend_changed: ${{ steps.check.outputs.frontend_changed }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - id: check
         run: |

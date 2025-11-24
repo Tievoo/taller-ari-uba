@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/ping", (_, res: Response) => {
-  res.status(200).send("okay");
+  res.status(200).send("ok");
 });
 
 app.use('/auth', require('./auth/routes').default);
