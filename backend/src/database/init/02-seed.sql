@@ -1,8 +1,8 @@
-INSERT INTO court_type (id, name, price)
+INSERT INTO court_type (name, price)
 VALUES
-    (1, 'Futbol 5', 53000),
-    (2, 'Futbol 7', 86000),
-    (3, 'Tenis', 30000);
+    ('Futbol 5', 53000),
+    ('Futbol 7', 86000),
+    ('Tenis', 30000);
 
 INSERT INTO courts (name, court_type_id, image)
 VALUES
