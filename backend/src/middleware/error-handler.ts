@@ -5,7 +5,7 @@ export enum ErrorType {
     NotFound = 'Not Found',
     BadRequest = 'Bad Request',
     InternalServerError = 'Internal Server Error',
-    Forbidden = 'Forbidden'
+    Forbidden = 'Forbidden',
 }
 
 const errorStatusMap: Record<ErrorType, number> = {
@@ -13,11 +13,11 @@ const errorStatusMap: Record<ErrorType, number> = {
     [ErrorType.Unauthorized]: 401,
     [ErrorType.Forbidden]: 403,
     [ErrorType.NotFound]: 404,
-    [ErrorType.InternalServerError]: 500
+    [ErrorType.InternalServerError]: 500,
 };
 
 export function errorHandler(
-    err: Error | { message: ErrorType },
+    err: Error | { message: ErrorType, httpStatus?: number },
     req: Request,
     res: Response,
     next: NextFunction
@@ -29,6 +29,10 @@ export function errorHandler(
         return res.status(status).json({ error: err.message });
     }
     
+    if ('httpStatus' in err && err.httpStatus) {
+        return res.status(err.httpStatus).json({ error: err.message });
+    }
+
     console.error('Unhandled error', err);
     const errorMessage = err instanceof Error ? err.message : 'An error occurred';
     return res.status(500).json({ 

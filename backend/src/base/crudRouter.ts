@@ -3,6 +3,33 @@ import { BaseModel } from './BaseModel';
 import { ErrorType } from '../middleware/error-handler';
 import { auth } from '../middleware/auth';
 
+// mapping sqlstate prefixes to http status codes
+const errorCodeMap: Record<string, number> = {
+    '23': 409,
+    '22': 400,
+    '42': 400,
+    '08': 503,
+    '53': 503,
+    '57': 503,
+    '58': 500,
+    'P0': 500,
+    'XX': 500,
+};
+
+type SqlState = {
+    code: string;
+    detail: string;
+}
+
+function sqlErrorToHttpError(error: SqlState): { message: string; httpStatus: number } {
+    const prefix = error.code.substring(0, 2);
+    const httpStatus = errorCodeMap[prefix] || 500;
+    return {
+        message: error.detail || 'Database error',
+        httpStatus,
+    };
+}
+
 interface CrudOptions {
     requireAuth?: boolean;
     requireAdmin?: boolean;
@@ -21,9 +48,9 @@ export function createCrudRouter<T>(
     } = options;
 
     const shouldInclude = (operation: string) => !only || only.includes(operation as any);
-    
-    const authMiddleware: RequestHandler = (requireAuth || requireAdmin) 
-        ? auth({ admin: requireAdmin }) 
+
+    const authMiddleware: RequestHandler = (requireAuth || requireAdmin)
+        ? auth({ admin: requireAdmin })
         : (req, res, next) => next();
 
     router.use(authMiddleware);
@@ -34,7 +61,7 @@ export function createCrudRouter<T>(
                 const items = await model.findAll();
                 res.json(items);
             } catch (error) {
-                next(error);
+                next(sqlErrorToHttpError(error as SqlState));
             }
         });
     }
@@ -48,7 +75,7 @@ export function createCrudRouter<T>(
                 }
                 res.json(item);
             } catch (error) {
-                next(error);
+                next(sqlErrorToHttpError(error as SqlState));
             }
         });
     }
@@ -58,8 +85,8 @@ export function createCrudRouter<T>(
             try {
                 const item = await model.create(req.body);
                 res.status(201).json(item);
-            } catch (error) {
-                next(error);
+            } catch (error: any) {
+                next(sqlErrorToHttpError(error as SqlState));
             }
         });
     }
@@ -69,14 +96,14 @@ export function createCrudRouter<T>(
             try {
                 const { id } = req.params;
                 if (!id) return next(new Error(ErrorType.BadRequest));
-                
+
                 const item = await model.update(id, req.body);
                 if (!item) {
                     return next(new Error(ErrorType.NotFound));
                 }
                 res.json(item);
             } catch (error) {
-                next(error);
+                next(sqlErrorToHttpError(error as SqlState));
             }
         });
     }
@@ -86,14 +113,14 @@ export function createCrudRouter<T>(
             try {
                 const { id } = req.params;
                 if (!id) return next(new Error(ErrorType.BadRequest));
-                
+
                 const deleted = await model.delete(id);
                 if (!deleted) {
                     return next(new Error(ErrorType.NotFound));
                 }
                 res.status(204).send();
             } catch (error) {
-                next(error);
+                next(sqlErrorToHttpError(error as SqlState));
             }
         });
     }

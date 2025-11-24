@@ -3,6 +3,12 @@ import { useAuth } from "../contexts/AuthContext";
 import Table from "../components/Table";
 import { adminApi, type TableType } from "../api/admin";
 
+type Column = {
+  key: string;
+  type: "string" | "number" | "date" | "time";
+  optional?: boolean;
+}
+
 const tableOptions: { type: TableType; label: string }[] = [
   { type: "users", label: "Users" },
   { type: "courts", label: "Courts" },
@@ -10,16 +16,39 @@ const tableOptions: { type: TableType; label: string }[] = [
   { type: "court-types", label: "Court Types" },
 ];
 
-const getFields = (tableType: TableType): string[] => {
+const getFields = (tableType: TableType): Column[] => {
   switch (tableType) {
     case "users":
-      return ["email", "first_name", "last_name", "password", "role"];
+      return [
+        { key: "id", type: "number" },
+        { key: "email", type: "string" },
+        { key: "first_name", type: "string" },
+        { key: "last_name", type: "string" },
+        { key: "password", type: "string" },
+        { key: "role", type: "string" },
+      ];
     case "courts":
-      return ["id", "name", "court_type_id", "image"];
+      return [
+        { key: "id", type: "number" },
+        { key: "name", type: "string" },
+        { key: "court_type_id", type: "number" },
+        { key: "image", type: "string" },
+      ];
     case "bookings":
-      return ["user_id", "court_id", "booking_date", "start_time", "end_time"];
+      return [
+        { key: "id", type: "number" },
+        { key: "user_id", type: "string" },
+        { key: "court_id", type: "string" },
+        { key: "booking_date", type: "date" },
+        { key: "start_time", type: "time" },
+        { key: "end_time", type: "time" },
+      ];
     case "court-types":
-      return ["id", "name", "price"];
+      return [
+        { key: "id", type: "number" },
+        { key: "name", type: "string" },
+        { key: "price", type: "number" },
+      ];
   }
 };
 
@@ -28,39 +57,33 @@ export default function Admin() {
   const [selectedTable, setSelectedTable] = useState<TableType>("users");
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newData, setNewData] = useState<Record<string, any>>({});
   const [editing, setEditing] = useState(false);
   const [editId, setEditId] = useState<string | number | null>(null);
-  const [courtTypes, setCourtTypes] = useState<any[]>([]);
 
   const fetchData = async (tableType: TableType) => {
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
     try {
       const response = await adminApi.getTable(tableType);
       setData(response.data);
     } catch (err) {
-      setError("Failed to load data");
+      setErrorMessage("Failed to load data: " + err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    console.log("New data:", newData);
+  }, [newData]);
+
+  useEffect(() => {
     fetchData("users");
     setSelectedTable("users");
   }, []);
-
-  useEffect(() => {
-    if (selectedTable === "courts") {
-      adminApi
-      .getTable("court-types")
-      .then((res) => setCourtTypes(res.data))
-      .catch(() => {});
-    }
-  }, [selectedTable]);
 
   const handleTableSelect = (tableType: TableType) => {
     setSelectedTable(tableType);
@@ -76,7 +99,7 @@ export default function Admin() {
       await adminApi.deleteTable(selectedTable, id);
       fetchData(selectedTable);
     } catch (err) {
-      setError("Failed to delete entry");
+      setErrorMessage("Failed to delete data: " + err);
     }
   };
 
@@ -86,7 +109,7 @@ export default function Admin() {
     setEditId(null);
     const initialData: Record<string, any> = {};
     fields.forEach((field) => {
-      initialData[field] = "";
+      initialData[field.key] = "";
     });
     setNewData(initialData);
   };
@@ -115,7 +138,7 @@ export default function Admin() {
       setEditId(null);
       setNewData({});
     } catch (err) {
-      setError("Failed to save entry");
+      setErrorMessage("Failed to save data: " + err);
     }
   };
 
@@ -174,51 +197,23 @@ export default function Admin() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               {fields.map((field) => {
-                let inputType = "text";
-                if (field === "booking_date") inputType = "date";
-                if (field === "start_time" || field === "end_time")
-                  inputType = "time";
-                if (field === "court_type_id") {
-                  return (
-                    <div key={field}>
-                      <label className="block text-sm font-medium mb-1">
-                        {field}
-                      </label>
-                      <select
-                        value={newData[field] || ""}
-                        onChange={(e) =>
-                          setNewData((prev) => ({
-                            ...prev,
-                            [field]: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      >
-                        <option value="">Select Court Type</option>
-                        {courtTypes.map((ct: any) => (
-                          <option key={ct.id} value={ct.id}>
-                            {ct.name} - {ct.id}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
-                }
+                let inputType = field.type
+                if (field.key === "id") return null;
                 return (
-                  <div key={field}>
+                  <div key={field.key}>
                     <label className="block text-sm font-medium mb-1">
-                      {field}
+                      {field.key}
                     </label>
                     <input
                       type={inputType}
-                      value={newData[field] || ""}
+                      value={inputType === "date" ? newData[field.key]?.split("T")[0] || "" : newData[field.key] || ""}
                       onChange={(e) =>
                         setNewData((prev) => ({
                           ...prev,
-                          [field]: e.target.value,
+                          [field.key]: e.target.value,
                         }))
                       }
-                      disabled={editing && field === "id"}
+                      disabled={adding && field.key === "id"}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-200"
                     />
                   </div>
@@ -229,6 +224,7 @@ export default function Admin() {
               <button
                 onClick={handleSave}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                disabled={fields.some((field) => field.key !== "id" && !field.optional && !newData[field.key])}
               >
                 {editing ? "Actualizar" : "Guardar"}
               </button>
@@ -243,8 +239,8 @@ export default function Admin() {
         )}
 
         {loading && <div>Loading...</div>}
-        {error && <div>{error}</div>}
-        {!loading && !error && (
+        {errorMessage && <span className="text-red-600">{errorMessage}</span>}
+        {!loading && !errorMessage && (
           <Table
             tableType={selectedTable}
             data={data}

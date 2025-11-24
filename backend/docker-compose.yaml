@@ -1,10 +1,11 @@
+name: alquiler-de-canchas
 services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: fulbo
-      POSTGRES_PASSWORD: fulbo123
-      POSTGRES_DB: fulbo_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:

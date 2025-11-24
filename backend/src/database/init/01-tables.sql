@@ -3,28 +3,21 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    password VARCHAR(255),
-    google_id VARCHAR(100) UNIQUE,
+    password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    role VARCHAR(50) DEFAULT 'user',
-    
-    CONSTRAINT users_auth_method_check 
-        CHECK (
-            password IS NOT NULL OR 
-            google_id IS NOT NULL
-        )
+    role VARCHAR(50) DEFAULT 'user'
 );
 
 CREATE TABLE court_type (
-    id TEXT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     price INTEGER NOT NULL
 );
 
 CREATE TABLE courts (
-    id TEXT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
-    court_type_id TEXT REFERENCES court_type(id) ON DELETE CASCADE,
+    court_type_id INT REFERENCES court_type(id) ON DELETE CASCADE,
     image TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -32,7 +25,7 @@ CREATE TABLE courts (
 CREATE TABLE bookings (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    court_id TEXT REFERENCES courts(id) ON DELETE CASCADE,
+    court_id INT REFERENCES courts(id) ON DELETE CASCADE,
     booking_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,

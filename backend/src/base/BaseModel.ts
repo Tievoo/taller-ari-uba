@@ -1,10 +1,5 @@
 import { dbClient } from "../database/db";
 
-type CascadeDependency = {
-  tableName: string;
-  foreignKey: string;
-};
-
 export class BaseModel<T> {
   constructor(protected tableName: string, protected idColumn: string = "id") {}
 

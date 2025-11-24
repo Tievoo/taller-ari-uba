@@ -1,12 +1,9 @@
 import { Router } from 'express';
 import { CourtModel } from './model';
 import { BookingModel } from '../bookings/model';
-import { createCrudRouter } from '../base/crudRouter';
 import { ErrorType } from '../middleware/error-handler';
 
 const router = Router();
-
-router.use(createCrudRouter(CourtModel, { only: ['findById'] }));
 
 router.get('/', async (req, res, next) => {
     try {
@@ -16,6 +13,19 @@ router.get('/', async (req, res, next) => {
         next(error);
     }
 })
+
+router.get('/:id', async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const court = await CourtModel.findFullById(id);
+        if (!court) {
+            return next(new Error(ErrorType.NotFound));
+        }
+        res.json(court);
+    } catch (error) {
+        next(error);
+    }
+});
 
 router.get('/:id/availability', async (req, res, next) => {
     const { id } = req.params;
