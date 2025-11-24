@@ -1,0 +1,53 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  detect-backend:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_changed: ${{ steps.check.outputs.backend_changed }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: check
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- backend/; then
+            echo "backend_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "backend_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+  detect-frontend:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.check.outputs.frontend_changed }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: check
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- frontend/; then
+            echo "frontend_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "frontend_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-backend:
+    needs: detect-backend
+    if: needs.detect-backend.outputs.backend_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cd backend && bun install && bun run build
+
+  build-frontend:
+    needs: detect-frontend
+    if: needs.detect-frontend.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cd frontend && bun install && bun run build
