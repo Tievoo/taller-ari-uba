@@ -1,6 +1,6 @@
 # Alquiler de Canchas
 
-Este es un sistema para administrar un club deportivo. Como usuario, se puede ver qué canchas tiene el club, consultar la disponibilidad de una cancha en una fecha específica, y realizar y cancelar reservas. Como administrador, se puede agregar, modificar y quitar canchas y reservas manualmente, además de administrar a los usuarios que tienen acceso.
+Este es un sistema para administrar un club deportivo. Como usuario, se puede ver qué canchas tiene el club, consultar la disponibilidad de una cancha en una fecha específica, y realizar y cancelar reservas. Como administrador, se puede agregar, modificar y quitar canchas y reservas manualmente, además de administrar a los usuarios que tienen acceso. Se puede acceder a una versión deployada del sistema [acá](https://alquiler-de-canchas-bbdd.onrender.com/).
 
 <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
   <img src="./frontend/public/canchas.png" width="500">
