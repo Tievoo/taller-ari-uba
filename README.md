@@ -1,6 +1,13 @@
 # Alquiler de Canchas
 
-## Para levantar todo en local:
+Este es un sistema para administrar un club deportivo. Como usuario, se puede ver qué canchas tiene el club, consultar la disponibilidad de una cancha en una fecha específica, y realizar y cancelar reservas. Como administrador, se puede agregar, modificar y quitar canchas y reservas manualmente, además de administrar a los usuarios que tienen acceso.
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+  <img src="./frontend/public/canchas.png" width="500">
+  <img src="./frontend/public/horarios.png" width="500">
+</div>
+
+## Para desarrollo en local:
 
 Como runtime, usamos [bun](https://bun.com/), una alternativa general a Node. El proyecto fue desarrollado con el mismo. 
 
