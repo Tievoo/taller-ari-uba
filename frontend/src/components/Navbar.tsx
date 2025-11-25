@@ -1,8 +1,14 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   return (
     <nav className="bg-linear-to-r from-primary-600 to-primary-700 text-white shadow-xl backdrop-blur-sm sticky top-0 z-50">
@@ -37,7 +43,7 @@ export default function Navbar() {
                 </Link>
               )}
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 hover:shadow-lg border border-white/20"
               >
                 <span className="hidden sm:inline">Cerrar Sesión</span>
