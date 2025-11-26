@@ -24,7 +24,7 @@ cp .env.example .env
 
 Correr el contenedor para la base de datos:
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 Y el server:
